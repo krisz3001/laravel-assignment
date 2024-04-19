@@ -13,16 +13,20 @@ return new class extends Migration
     {
         Schema::create('character_contest', function (Blueprint $table) {
             $table->id();
-            $table->timestamps();
 
             $table->unsignedBigInteger('character_id');
-            $table->foreign('character_id')->references('id')->on('characters');
+            $table->foreign('character_id')->references('id')->on('characters')->onDelete('cascade');;
+
+            $table->unsignedBigInteger('enemy_id');
+            $table->foreign('enemy_id')->references('id')->on('characters')->onDelete('cascade');;
 
             $table->unsignedBigInteger('contest_id');
-            $table->foreign('contest_id')->references('id')->on('contests');
+            $table->foreign('contest_id')->references('id')->on('contests')->onDelete('cascade');;
 
             $table->float('hero_hp')->default(20);
             $table->float('enemy_hp')->default(20);
+
+            $table->timestamps();
         });
     }
 

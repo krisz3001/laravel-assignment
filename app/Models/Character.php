@@ -32,6 +32,9 @@ class Character extends Model
 
     public function contests(): BelongsToMany
     {
+        if ($this->enemy) {
+            return $this->belongsToMany(Contest::class, 'character_contest', 'enemy_id');
+        }
         return $this->belongsToMany(Contest::class);
     }
 }

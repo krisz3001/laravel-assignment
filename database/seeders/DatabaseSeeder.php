@@ -27,6 +27,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             CharacterSeeder::class,
             PlaceSeeder::class,
+            ContestSeeder::class,
         ]);
     }
 }

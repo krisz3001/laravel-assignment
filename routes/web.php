@@ -1,10 +1,44 @@
 <?php
 
+use App\Http\Controllers\CharacterController;
+use App\Http\Controllers\ContestController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
+use App\Models\Contest;
+use App\Models\User;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return redirect()->route('users.index');
+    if (auth()->check()) {
+        return redirect()->route('dashboard');
+    }
+    $users = User::all();
+    $contests = Contest::all();
+    return view('character.default', ['users_count' => $users->count(), 'contests_count' => $contests->count()]);
 });
 
-Route::resource('users', UserController::class);
+Route::get('/dashboard', function () {
+    return redirect()->route('characters.index');
+})->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::resources([
+        'users' => UserController::class,
+        'characters' => CharacterController::class,
+        'contests' => ContestController::class,
+    ]);
+});
+
+Route::get('*', function () {
+    return redirect()->route('characters.index');
+})->middleware('auth');
+
+Route::fallback(function () {
+    return redirect('/');
+});
+
+require __DIR__ . '/auth.php';

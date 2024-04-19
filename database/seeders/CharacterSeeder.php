@@ -15,14 +15,26 @@ class CharacterSeeder extends Seeder
     public function run(): void
     {
         //
+
+        $admin = User::find(1);
+        Character::factory()->for($admin)->create(
+            [
+                'user_id' => $admin->id,
+                'enemy' => true,
+                'name' => 'Test Enemy',
+            ]
+        );
+
         $users = User::all();
         foreach ($users as $user) {
-            Character::factory(5)
-                ->for($user)
-                ->create([
-                    'user_id' => $user->id,
-                    'enemy' => $user['admin'] ? fake()->boolean() : false,
-                ]);
+            for ($i = 0; $i < 5; $i++) {
+                Character::factory()->for($user)->create(
+                    [
+                        'user_id' => $user->id,
+                        'enemy' => $user['admin'] ? fake()->boolean() : false,
+                    ]
+                );
+            }
         }
     }
 }
