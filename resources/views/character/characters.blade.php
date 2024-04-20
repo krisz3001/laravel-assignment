@@ -3,6 +3,7 @@
 @section('title', 'Characters')
 
 @section('content')
+    <a href="{{ route('characters.create') }}" class="btn btn-primary mb-3">New character</a>
     <table class="table table-pin-rows">
         <thead>
             <tr>
@@ -18,7 +19,7 @@
             @foreach ($characters as $character)
                 <tr>
                     <td><a href="{{ route('characters.show', $character) }}" class="link">{{ $character->name }}</a></td>
-                    <td>{{ $character->enemy }}</td>
+                    <td>{{ $character->enemy ? 'Yes' : 'No' }}</td>
                     <td>{{ $character->defence }}</td>
                     <td>{{ $character->strength }}</td>
                     <td>{{ $character->accuracy }}</td>

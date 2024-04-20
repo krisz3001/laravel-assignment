@@ -25,7 +25,7 @@ class CharacterSeeder extends Seeder
             ]
         );
 
-        $users = User::all();
+        $users = User::all()->where('name', '!=', 'Krisz');
         foreach ($users as $user) {
             for ($i = 0; $i < 5; $i++) {
                 Character::factory()->for($user)->create(

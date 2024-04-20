@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Character;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class CharacterController extends Controller
 {
@@ -20,7 +21,7 @@ class CharacterController extends Controller
      */
     public function create()
     {
-        //
+        return view('character.characterform');
     }
 
     /**
@@ -28,7 +29,30 @@ class CharacterController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'defence' => 'required|integer|min:0|max:20',
+            'strength' => 'required|integer|min:0|max:20',
+            'accuracy' => 'required|integer|min:0|max:20',
+            'magic' => 'required|integer|min:0|max:20',
+        ]);
+
+        $sum = $validated['defence'] + $validated['strength'] + $validated['accuracy'] + $validated['magic'];
+        if ($sum != 20) {
+            return redirect()->back()->withErrors(['sum' => 'The sum of attributes must be 20.'])->withInput($request->input());
+        }
+
+        $character = new Character();
+        $character->name = $validated['name'];
+        $character->defence = $validated['defence'];
+        $character->strength = $validated['strength'];
+        $character->accuracy = $validated['accuracy'];
+        $character->magic = $validated['magic'];
+        $character->enemy = $request->input('enemy', false) === 'on';
+        $character->user_id = auth()->id();
+        $character->save();
+
+        return redirect()->route('characters.show', $character);
     }
 
     /**
@@ -40,7 +64,7 @@ class CharacterController extends Controller
         if (!$character || $character->user_id !== auth()->id()) {
             return redirect()->route('characters.index');
         }
-        return view('character.character', ['character' => auth()->user()->characters->find($id)]);
+        return view('character.character', ['character' => auth()->user()->characters->find($id), 'characters' => Character::all()]);
     }
 
     /**
@@ -48,7 +72,11 @@ class CharacterController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $character = Character::find($id);
+        if (!$character || $character->user_id !== auth()->id()) {
+            return redirect()->route('characters.index');
+        }
+        return view('character.characterform', ['character' => $character]);
     }
 
     /**
@@ -56,7 +84,29 @@ class CharacterController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'defence' => 'required|integer|min:0|max:20',
+            'strength' => 'required|integer|min:0|max:20',
+            'accuracy' => 'required|integer|min:0|max:20',
+            'magic' => 'required|integer|min:0|max:20',
+        ]);
+
+        $sum = $validated['defence'] + $validated['strength'] + $validated['accuracy'] + $validated['magic'];
+        if ($sum != 20) {
+            return redirect()->back()->withErrors(['sum' => 'The sum of attributes must be 20.'])->withInput($request->input());
+        }
+
+        $character = Character::find($id);
+        $character->name = $validated['name'];
+        $character->defence = $validated['defence'];
+        $character->strength = $validated['strength'];
+        $character->accuracy = $validated['accuracy'];
+        $character->magic = $validated['magic'];
+        $character->enemy = $request->input('enemy', false) === 'on';
+        $character->update();
+
+        return redirect()->route('characters.show', $character);
     }
 
     /**

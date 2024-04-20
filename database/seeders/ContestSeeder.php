@@ -30,6 +30,7 @@ class ContestSeeder extends Seeder
                 ])->create([
                     'place_id' => $place->id,
                     'win' => $win,
+                    'history' => $win ? $hero->name . ' defeated ' . $enemy->name . '.' : $enemy->name . ' defeated ' . $hero->name . '.',
                 ]);
         }
     }

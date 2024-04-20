@@ -18,7 +18,7 @@ class PlaceFactory extends Factory
     {
         return [
             'name' => fake()->address(),
-            'image' => fake()->imageUrl(),
+            'image' => fake()->imageUrl(1920, 1080, 'Merida dual thrust', true),
         ];
     }
 }

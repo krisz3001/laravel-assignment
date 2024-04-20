@@ -9,6 +9,12 @@
     <title>Game | @yield('title')</title>
 
     <style>
+        html,
+        body {
+            min-height: 100%;
+            height: auto;
+        }
+
         nav {
             display: flex;
             justify-content: space-between;
@@ -45,6 +51,7 @@
         main {
             margin: 0 auto;
             width: 1200px;
+            max-width: 100%;
         }
 
         .buttons {
@@ -65,11 +72,11 @@
                 </div>
             @endif
         </div>
-        <div class="profile">
+        <div class="profile me-2">
             @if (Auth::check())
                 <span>Logged in as: <a href="{{ route('profile.edit') }}"
                         class="link">{{ Auth::user()->name }}</a></span>
-                <form action="{{ route('logout') }}" method="POST">
+                <form action="{{ route('logout') }}" method="POST" class="m-0">
                     @csrf
                     <button class="btn btn-primary" type="submit">Logout</button>
                 </form>
