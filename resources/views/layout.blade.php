@@ -9,10 +9,12 @@
     <title>Game | @yield('title')</title>
 
     <style>
-        html,
+        html {
+            height: 100%;
+        }
+
         body {
             min-height: 100%;
-            height: auto;
         }
 
         nav {
@@ -69,6 +71,9 @@
             @if (Auth::check())
                 <div class="menubar">
                     <a href="{{ route('dashboard') }}" class="btn btn-primary">Characters</a>
+                    @if (Auth::user()->admin)
+                        <a href="{{ route('places.index') }}" class="btn btn-primary">Places</a>
+                    @endif
                 </div>
             @endif
         </div>

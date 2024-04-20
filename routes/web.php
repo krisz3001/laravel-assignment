@@ -2,8 +2,10 @@
 
 use App\Http\Controllers\CharacterController;
 use App\Http\Controllers\ContestController;
+use App\Http\Controllers\PlaceController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
+use App\Http\Middleware\isAdmin;
 use App\Models\Contest;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
@@ -33,14 +35,12 @@ Route::middleware('auth')->group(function () {
         'characters' => CharacterController::class,
         'contests' => ContestController::class,
     ]);
+
+    Route::resource('places', PlaceController::class)->middleware(isAdmin::class);
 });
 
-Route::get('*', function () {
-    return redirect()->route('characters.index');
-})->middleware('auth');
-
-Route::fallback(function () {
+/* Route::fallback(function () {
     return redirect('/');
-});
+}); */
 
 require __DIR__ . '/auth.php';

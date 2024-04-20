@@ -4,7 +4,11 @@
 
 <style>
     body {
-        background-image: url('{{ $contest->place->image }}');
+        @if (!str_contains($contest->place->image, 'http'))
+            background-image: url('{{ Request::root() . '/' . $contest->place->image }}');
+        @else
+            background-image: url('{{ $contest->place->image }}');
+        @endif
         /* background-repeat: no-repeat;
         background-size: cover;
         background-position: center; */
@@ -42,7 +46,7 @@
 </style>
 
 @section('content')
-    <h1 class="text-2xl">Contest</h1>
+    <h1 class="text-2xl mb-2">Contest</h1>
     <hr>
     <div class="players">
         @if ($contest->win !== null)
