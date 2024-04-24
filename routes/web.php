@@ -4,7 +4,6 @@ use App\Http\Controllers\CharacterController;
 use App\Http\Controllers\ContestController;
 use App\Http\Controllers\PlaceController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\UserController;
 use App\Http\Middleware\isAdmin;
 use App\Models\Contest;
 use App\Models\User;
@@ -30,17 +29,15 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/contests/{contest}/attack/{type}', [ContestController::class, 'attack'])->name('contests.attack');
 
-    Route::resources([
-        'users' => UserController::class,
-        'characters' => CharacterController::class,
-        'contests' => ContestController::class,
-    ]);
+    Route::resource('characters', CharacterController::class);
+    Route::resource('contests', ContestController::class)->except(['index', 'create', 'edit', 'update', 'destroy']);;
+
 
     Route::resource('places', PlaceController::class)->middleware(isAdmin::class);
 });
 
-/* Route::fallback(function () {
+Route::fallback(function () {
     return redirect('/');
-}); */
+});
 
 require __DIR__ . '/auth.php';
