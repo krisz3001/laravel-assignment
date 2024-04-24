@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Character;
+use App\Models\Place;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -67,8 +68,9 @@ class CharacterController extends Controller
 
         $enemyCount = Character::all()->where('enemy', true)->count();
         $enoughEnemies =  ($character->enemy && $enemyCount > 1) || (!$character->enemy && $enemyCount > 0);
+        $placeExists = Place::all()->count() > 0;
 
-        return view('character.character', ['character' => auth()->user()->characters->find($id), 'characters' => Character::all(), 'enoughEnemies' => $enoughEnemies]);
+        return view('character.character', ['character' => auth()->user()->characters->find($id), 'characters' => Character::all(), 'enoughEnemies' => $enoughEnemies, 'placeExists' => $placeExists]);
     }
 
     /**

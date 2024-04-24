@@ -44,6 +44,8 @@
     <div class="buttons">
         @if (!$enoughEnemies)
             <button class="btn btn-error">Not enough enemies</button>
+        @elseif (!$placeExists)
+            <button class="btn btn-error">No places available</button>
         @else
             <form action="{{ route('contests.store', ['character' => $character]) }}" method="POST">
                 @csrf
