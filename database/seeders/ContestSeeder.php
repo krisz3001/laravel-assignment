@@ -22,16 +22,24 @@ class ContestSeeder extends Seeder
             $hero = Character::all()->where('enemy', false)->random();
             $win = fake()->boolean();
 
-            Contest::factory()
-                ->hasAttached($hero, [
-                    'enemy_id' => $enemy->id,
-                    'hero_hp' => $win ? fake()->numberBetween(1, 20) : 0,
-                    'enemy_hp' => $win ? 0 : fake()->numberBetween(1, 20),
-                ])->create([
-                    'place_id' => $place->id,
-                    'win' => $win,
-                    'history' => $win ? $hero->name . ' defeated ' . $enemy->name . '.' : $enemy->name . ' defeated ' . $hero->name . '.',
-                ]);
+            $contest = Contest::factory()->create([
+                'place_id' => $place->id,
+                'win' => $win,
+                'history' => $win ? $hero->name . ' defeated ' . $enemy->name . '.' : $enemy->name . ' defeated ' . $hero->name . '.',
+            ]);
+
+            $hero_hp = $win ? fake()->numberBetween(1, 20) : 0;
+            $enemy_hp = $win ? 0 : fake()->numberBetween(1, 20);
+
+            $contest->characters()->attach($hero->id, [
+                'hero_hp' => $hero_hp,
+                'enemy_hp' => $enemy_hp,
+            ]);
+
+            $contest->characters()->attach($enemy->id, [
+                'hero_hp' => $hero_hp,
+                'enemy_hp' => $enemy_hp,
+            ]);
         }
     }
 }

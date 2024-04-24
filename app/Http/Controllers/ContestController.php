@@ -31,23 +31,29 @@ class ContestController extends Controller
      */
     public function store(Request $request)
     {
-        $character = Character::find($request->input('character'));
-        $isEnemy = $character->enemy;
-        $hero = $character;
-        if ($isEnemy) {
-            $enemy = Character::all()->where('enemy', false)->random();
-        } else {
-            $enemy = Character::all()->where('enemy', true)->random();
+        $hero = Character::find($request->input('character'));
+        if ($hero->enemy && Character::all()->where('enemy', true)->count() < 2) {
+            return redirect()->route('characters.index');
         }
+        $enemy = Character::all()->where('enemy', true)->where('id', '!=', $hero->id)->random();
         $place = Place::all()->random();
-        $contest = Contest::factory()
-            ->hasAttached($hero, [
-                'enemy_id' => $enemy->id,
-            ])->create([
-                'place_id' => $place->id,
-                'win' => null,
-                'history' => '',
-            ]);
+        $contest = Contest::factory()->create([
+            'place_id' => $place->id,
+            'win' => null,
+            'history' => '',
+        ]);
+
+        $hp = 20;
+
+        $contest->characters()->attach($hero->id, [
+            'hero_hp' => $hp,
+            'enemy_hp' => $hp,
+        ]);
+
+        $contest->characters()->attach($enemy->id, [
+            'hero_hp' => $hp,
+            'enemy_hp' => $hp,
+        ]);
 
         return redirect()->route('contests.show', $contest);
     }
@@ -61,9 +67,21 @@ class ContestController extends Controller
         if (!$contest) {
             return redirect()->route('characters.index');
         }
+
         $characters = $contest->characters;
-        $hero = Character::find($characters->first()->id);
-        $enemy = Character::find($characters->first()->pivot->enemy_id);
+
+        if ($characters->where('enemy', true)->count() === 2) {
+            $hero = $characters->where('enemy', true)->first();
+            $enemy = $characters->where('enemy', true)->last();
+            return view('contest.contest', ['contest' => $contest, 'hero' => $hero, 'enemy' => $enemy]);
+        } else if ($characters->where('enemy', false)->count() === 1) {
+            $hero = $characters->where('enemy', false)->first();
+            $enemy = $characters->where('enemy', true)->first();
+            return view('contest.contest', ['contest' => $contest, 'hero' => $hero, 'enemy' => $enemy]);
+        }
+
+        $hero = $characters->first();
+        $enemy = $characters->last();
         return view('contest.contest', ['contest' => $contest, 'hero' => $hero, 'enemy' => $enemy]);
     }
 
@@ -87,13 +105,28 @@ class ContestController extends Controller
             return redirect()->route('contests.show', $id);
         }
 
-        $data = $contest->characters->first()->pivot;
+        $characters = $contest->characters;
 
-        $enemy = Character::find($data->enemy_id);
-        $hero = Character::find($data->character_id);
 
-        $enemy_hp = $data->enemy_hp;
-        $hero_hp = $data->hero_hp;
+        if ($characters->where('enemy', true)->count() === 2) {
+            $hero = $characters->where('enemy', true)->first();
+            $enemy = $characters->where('enemy', true)->last();
+
+            $hero_hp = $hero->pivot->hero_hp;
+            $enemy_hp = $enemy->pivot->enemy_hp;
+        } else if ($characters->where('enemy', false)->count() === 1) {
+            $hero = $characters->where('enemy', false)->first();
+            $enemy = $characters->where('enemy', true)->first();
+
+            $hero_hp = $hero->pivot->hero_hp;
+            $enemy_hp = $enemy->pivot->enemy_hp;
+        } else {
+            $hero = $characters->first();
+            $enemy = $characters->last();
+
+            $hero_hp = $hero->pivot->hero_hp;
+            $enemy_hp = $enemy->pivot->enemy_hp;
+        }
 
 
         // The hero attacks
@@ -104,6 +137,10 @@ class ContestController extends Controller
 
         $contest->update([
             'history' => $contest->history . '[' . Carbon::now('Europe/Budapest')->format('Y.m.d. H:i:s') . '] ' . $hero->name . ' attacked ' . $enemy->name . ' with ' . $type . ' and dealt ' . $enemy_damage . ' damage.' . '<br>',
+        ]);
+
+        $contest->characters()->updateExistingPivot($enemy->id, [
+            'enemy_hp' => $enemy_hp <= 0 ? 0 : $enemy_hp,
         ]);
 
         $contest->characters()->updateExistingPivot($hero->id, [
@@ -142,6 +179,10 @@ class ContestController extends Controller
         }
 
         $contest->characters()->updateExistingPivot($hero->id, [
+            'hero_hp' => $hero_hp,
+        ]);
+
+        $contest->characters()->updateExistingPivot($enemy->id, [
             'hero_hp' => $hero_hp,
         ]);
 

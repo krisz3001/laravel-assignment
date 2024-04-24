@@ -17,7 +17,7 @@
 @section('content')
     <h1 class="text-2xl mb-2">{{ $character->name }}</h1>
     <hr>
-    <div class="m-5 border border-slate-300 rounded bg-slate-800 p-5 flex w-2/12">
+    <div class="m-5 border border-slate-300 rounded bg-slate-800 p-5 inline-block">
         <table class="table-sm">
             <tr>
                 <td>⚔️ Enemy</td>
@@ -42,10 +42,14 @@
         </table>
     </div>
     <div class="buttons">
-        <form action="{{ route('contests.store', ['character' => $character]) }}" method="POST">
-            @csrf
-            <button class="btn btn-primary">New contest</button>
-        </form>
+        @if (!$enoughEnemies)
+            <button class="btn btn-error">Not enough enemies</button>
+        @else
+            <form action="{{ route('contests.store', ['character' => $character]) }}" method="POST">
+                @csrf
+                <button class="btn btn-primary">New contest</button>
+            </form>
+        @endif
         <a href="{{ route('characters.edit', $character) }}" class="btn btn-primary">Edit</a>
         <form action="{{ route('characters.destroy', $character) }}" method="POST">
             @csrf
@@ -65,10 +69,10 @@
                         class="border border-slate-300 flex-auto rounded bg-slate-800 p-3 hover:bg-slate-200 cursor-pointer hover:text-slate-800">
                         <p>📍 Place: {{ $contest->place->name }}</p>
                         <p class="mt-5">
-                            ⚔️ Opponent: @if ($character->enemy)
-                                {{ $characters->where('id', $contest->enemy->first()->pivot->character_id)->first()->name }}
+                            @if ($contest->characters->where('enemy', true)->count() === 0)
+                                ⚔️ Opponent: {{ $contest->characters->last()->name }}
                             @else
-                                {{ $characters->where('id', $contest->enemy->first()->pivot->enemy_id)->first()->name }}
+                                ⚔️ Opponent: {{ $contest->characters->where('enemy', true)->last()->name }}
                             @endif
                         </p>
                     </div>

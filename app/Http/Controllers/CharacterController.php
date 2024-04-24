@@ -48,7 +48,7 @@ class CharacterController extends Controller
         $character->strength = $validated['strength'];
         $character->accuracy = $validated['accuracy'];
         $character->magic = $validated['magic'];
-        $character->enemy = $request->input('enemy', false) === 'on';
+        $character->enemy = $request->input('enemy', false) === '1';
         $character->user_id = auth()->id();
         $character->save();
 
@@ -64,7 +64,11 @@ class CharacterController extends Controller
         if (!$character || $character->user_id !== auth()->id()) {
             return redirect()->route('characters.index');
         }
-        return view('character.character', ['character' => auth()->user()->characters->find($id), 'characters' => Character::all()]);
+
+        $enemyCount = Character::all()->where('enemy', true)->count();
+        $enoughEnemies =  ($character->enemy && $enemyCount > 1) || (!$character->enemy && $enemyCount > 0);
+
+        return view('character.character', ['character' => auth()->user()->characters->find($id), 'characters' => Character::all(), 'enoughEnemies' => $enoughEnemies]);
     }
 
     /**
@@ -103,7 +107,7 @@ class CharacterController extends Controller
         $character->strength = $validated['strength'];
         $character->accuracy = $validated['accuracy'];
         $character->magic = $validated['magic'];
-        $character->enemy = $request->input('enemy', false) === 'on';
+        $character->enemy = $request->input('enemy', false) === '1';
         $character->update();
 
         return redirect()->route('characters.show', $character);

@@ -17,11 +17,10 @@ class CharacterSeeder extends Seeder
         //
 
         $admin = User::find(1);
-        Character::factory()->for($admin)->create(
+        Character::factory(2)->for($admin)->create(
             [
                 'user_id' => $admin->id,
                 'enemy' => true,
-                'name' => 'Test Enemy',
             ]
         );
 
