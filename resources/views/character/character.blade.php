@@ -68,13 +68,8 @@
                     <div
                         class="border border-slate-300 flex-auto rounded bg-slate-800 p-3 hover:bg-slate-200 cursor-pointer hover:text-slate-800">
                         <p>📍 Place: {{ $contest->place->name }}</p>
-                        <p class="mt-5">
-                            @if ($contest->characters->where('enemy', true)->count() === 0)
-                                ⚔️ Opponent: {{ $contest->characters->last()->name }}
-                            @else
-                                ⚔️ Opponent: {{ $contest->characters->where('enemy', true)->last()->name }}
-                            @endif
-                        </p>
+                        <p class="mt-5">⚔️ Opponent:
+                            {{ $contest->characters->where('id', '!=', $character->id)->first()->name }}</p>
                     </div>
                 </a>
             @endforeach

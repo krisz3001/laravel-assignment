@@ -14,6 +14,9 @@ class PlaceController extends Controller
      */
     public function index()
     {
+        if (!auth()->user()->admin) {
+            return redirect()->route('characters.index');
+        }
         return view('place.places', ['places' => Place::all()]);
     }
 
@@ -22,6 +25,9 @@ class PlaceController extends Controller
      */
     public function create()
     {
+        if (!auth()->user()->admin) {
+            return redirect()->route('characters.index');
+        }
         return view('place.placeform');
     }
 
@@ -30,6 +36,9 @@ class PlaceController extends Controller
      */
     public function store(Request $request)
     {
+        if (!auth()->user()->admin) {
+            return redirect()->route('characters.index');
+        }
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'image' => 'required|image',
@@ -60,6 +69,9 @@ class PlaceController extends Controller
      */
     public function edit(string $id)
     {
+        if (!auth()->user()->admin) {
+            return redirect()->route('characters.index');
+        }
         return view('place.placeform', ['place' => Place::find($id)]);
     }
 
@@ -68,6 +80,9 @@ class PlaceController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        if (!auth()->user()->admin) {
+            return redirect()->route('characters.index');
+        }
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'image' => 'nullable|image',
@@ -94,6 +109,9 @@ class PlaceController extends Controller
      */
     public function destroy(string $id)
     {
+        if (!auth()->user()->admin) {
+            return redirect()->route('characters.index');
+        }
         $place = Place::find($id);
         if (!$place) {
             return redirect()->route('places.index');

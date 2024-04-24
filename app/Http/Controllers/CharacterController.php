@@ -31,7 +31,7 @@ class CharacterController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'defence' => 'required|integer|min:0|max:20',
+            'defence' => 'required|integer|min:0|max:3',
             'strength' => 'required|integer|min:0|max:20',
             'accuracy' => 'required|integer|min:0|max:20',
             'magic' => 'required|integer|min:0|max:20',
@@ -88,9 +88,13 @@ class CharacterController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        $character = Character::find($id);
+        if (!$character || $character->user_id !== auth()->id()) {
+            return redirect()->route('characters.index');
+        }
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'defence' => 'required|integer|min:0|max:20',
+            'defence' => 'required|integer|min:0|max:3',
             'strength' => 'required|integer|min:0|max:20',
             'accuracy' => 'required|integer|min:0|max:20',
             'magic' => 'required|integer|min:0|max:20',
@@ -101,7 +105,6 @@ class CharacterController extends Controller
             return redirect()->back()->withErrors(['sum' => 'The sum of attributes must be 20.'])->withInput($request->input());
         }
 
-        $character = Character::find($id);
         $character->name = $validated['name'];
         $character->defence = $validated['defence'];
         $character->strength = $validated['strength'];
@@ -122,7 +125,7 @@ class CharacterController extends Controller
         if (!$character || $character->user_id !== auth()->id()) {
             return redirect()->route('characters.index');
         }
-        Character::find($id)->delete();
+        $character->delete();
         return redirect()->route('characters.index');
     }
 }

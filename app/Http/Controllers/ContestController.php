@@ -55,6 +55,10 @@ class ContestController extends Controller
 
         $characters = $contest->characters;
 
+        if (auth()->user()->id !== $characters->first()->user_id) {
+            return redirect()->route('characters.index');
+        }
+
         if ($characters->where('enemy', true)->count() === 2) {
             $hero = $characters->where('enemy', true)->first();
             $enemy = $characters->where('enemy', true)->last();
